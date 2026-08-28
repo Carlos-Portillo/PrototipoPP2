@@ -22,15 +22,17 @@ const getRoleRedirect = (role?: string) => {
   }
 };
 
-const PrivateRoute = ({ children, roles }: { children: React.ReactNode, roles: string[] }) => {
+const PrivateRoute = ({ children, roles }: { children: React.ReactNode; roles: string[] }) => {
   const { user } = useAuth();
+
   if (!user) return <Navigate to="/login" replace />;
   if (!roles.includes(user.role)) return <Navigate to={getRoleRedirect(user.role)} replace />;
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen bg-slate-100 text-slate-800">
       <Sidebar />
       <Header />
-      <main className="ml-64 pt-16">
+      <main className="ml-72 pt-20 p-6">
         {children}
       </main>
     </div>
@@ -39,6 +41,7 @@ const PrivateRoute = ({ children, roles }: { children: React.ReactNode, roles: s
 
 const AppRoutes = () => {
   const { user } = useAuth();
+
   return (
     <Routes>
       <Route path="/" element={<Navigate to={user ? getRoleRedirect(user.role) : '/login'} replace />} />
