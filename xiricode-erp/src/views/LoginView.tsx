@@ -7,7 +7,7 @@ export const LoginView: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const handleMockLogin = (role: 'CAJERO' | 'SUPERVISOR' | 'GERENTE', path: string) => {
+  const handleMockLogin = (role: 'CAJERO' | 'SUPERVISOR' | 'GERENTE' | 'BODEGUERO' | 'GESTOR_COMPRAS', path: string) => {
     login(role);
     navigate(path, { replace: true });
   };
@@ -28,6 +28,8 @@ export const LoginView: React.FC = () => {
         <div className="space-y-4 mb-8">
           <button onClick={() => handleMockLogin('CAJERO', '/emission')} className="w-full bg-[#2563EB] text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition">Entrar como Cajero (Punto de Venta)</button>
           <button onClick={() => handleMockLogin('SUPERVISOR', '/monitor')} className="w-full bg-[#1E293B] text-white py-3 rounded-lg font-medium hover:bg-slate-800 transition">Entrar como Supervisor (Monitor TI)</button>
+          <button onClick={() => handleMockLogin('BODEGUERO', '/inventory')} className="w-full bg-amber-600 text-white py-3 rounded-lg font-medium hover:bg-amber-700 transition">Entrar como Bodeguero (Kardex)</button>
+          <button onClick={() => handleMockLogin('GESTOR_COMPRAS', '/inventory')} className="w-full bg-cyan-700 text-white py-3 rounded-lg font-medium hover:bg-cyan-800 transition">Entrar como Gestor de Compras (Abastecimiento)</button>
           <button onClick={() => handleMockLogin('GERENTE', '/dashboard')} className="w-full bg-slate-200 text-slate-800 py-3 rounded-lg font-medium hover:bg-slate-300 transition">Entrar como Gerente (Dashboard)</button>
         </div>
 

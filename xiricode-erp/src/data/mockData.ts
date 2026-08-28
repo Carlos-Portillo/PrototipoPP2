@@ -8,9 +8,16 @@ export const mockCustomers: Customer[] = [
 ];
 
 export const mockProducts: Product[] = [
-  { id: 'p1', name: 'Road-150 Red 48', sku: 'BK-R93R-48', price: 1450.99, stock: 12 },
-  { id: 'p2', name: 'Mountain-200 Black 42', sku: 'BK-M82B-42', price: 1250.00, stock: 5 },
-  { id: 'p3', name: 'Sport-100 Helmet, Red', sku: 'HL-U509-R', price: 34.99, stock: 50 }
+  { id: 'p1', name: 'Road-150 Red 48', sku: 'BK-R93R-48', price: 1450.99, stock: 12, minStock: 10, category: 'Bicicletas', warehouse: 'Bodega Central' },
+  { id: 'p2', name: 'Mountain-200 Black 42', sku: 'BK-M82B-42', price: 1250.00, stock: 5, minStock: 8, category: 'Bicicletas', warehouse: 'Bodega Central' },
+  { id: 'p3', name: 'Sport-100 Helmet, Red', sku: 'HL-U509-R', price: 34.99, stock: 50, minStock: 20, category: 'Accesorios', warehouse: 'Bodega Central' },
+  { id: 'p4', name: 'Road-650 Black 60', sku: 'BK-R89B-60', price: 782.99, stock: 3, minStock: 6, category: 'Bicicletas', warehouse: 'Sucursal Santa Ana' },
+  { id: 'p5', name: 'Water Bottle - 30 oz.', sku: 'AC-BOT-30', price: 4.99, stock: 120, minStock: 40, category: 'Accesorios', warehouse: 'Bodega Central' },
+  { id: 'p6', name: 'Touring-3000 Blue 54', sku: 'BK-T30B-54', price: 742.35, stock: 0, minStock: 5, category: 'Bicicletas', warehouse: 'Sucursal San Miguel' },
+  { id: 'p7', name: 'LL Bottom Bracket', sku: 'BB-LL-001', price: 15.75, stock: 9, minStock: 15, category: 'Repuestos', warehouse: 'Bodega Central' },
+  { id: 'p8', name: 'Chain Lock Cable', sku: 'AC-LOCK-01', price: 18.50, stock: 32, minStock: 15, category: 'Accesorios', warehouse: 'Sucursal Santa Ana' },
+  { id: 'p9', name: 'Half-Finger Gloves, M', sku: 'AC-GLV-M', price: 24.49, stock: 6, minStock: 12, category: 'Accesorios', warehouse: 'Bodega Central' },
+  { id: 'p10', name: 'Mountain Tire Tube', sku: 'RP-TUBE-M', price: 4.20, stock: 60, minStock: 25, category: 'Repuestos', warehouse: 'Sucursal San Miguel' }
 ];
 
 export const mockDTEs: DTE[] = [

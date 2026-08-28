@@ -1,14 +1,18 @@
 import React, { useMemo, useState } from 'react';
-import { Download, FileDown, Printer, QrCode, ShieldCheck, ShoppingCart, Sparkles } from 'lucide-react';
+import { CloudCog, Download, FileDown, Printer, QrCode, ShieldCheck, ShoppingCart, Sparkles } from 'lucide-react';
 import { mockCustomers, mockProducts } from '../data/mockData';
-import type { DTEItem } from '../types';
+import type { DTE, DTEItem } from '../types';
 import { useNavigate } from 'react-router-dom';
+import { useOperations } from '../context/OperationsContext';
 
 export const NewEmissionView: React.FC = () => {
   const [items, setItems] = useState<Record<string, number>>({});
   const [customerId, setCustomerId] = useState(mockCustomers[0].id);
-  const [type, setType] = useState('CREDITO_FISCAL');
+  const [type, setType] = useState<'FACTURA' | 'CREDITO_FISCAL'>('CREDITO_FISCAL');
+  const [isEmitting, setIsEmitting] = useState(false);
   const navigate = useNavigate();
+  const { dtes, addDTE, mhStatus } = useOperations();
+  const isContingency = mhStatus === 'CONTINGENCIA';
 
   const cart: DTEItem[] = useMemo(() => {
     return mockProducts
@@ -25,6 +29,8 @@ export const NewEmissionView: React.FC = () => {
   const iva = type === 'CREDITO_FISCAL' ? subtotal * 0.13 : 0;
   const retencion = selectedCustomer.isGranContribuyente && subtotal >= 113 ? subtotal * 0.01 : 0;
   const total = subtotal + iva - retencion;
+  const hasStockIssue = cart.some((item) => item.quantity > item.stock);
+  const canEmit = cart.length > 0 && !hasStockIssue && !isEmitting;
 
   const addProduct = (productId: string) => {
     setItems((current) => ({
@@ -40,11 +46,34 @@ export const NewEmissionView: React.FC = () => {
     }));
   };
 
-  const handleEmit = () => {
-    setTimeout(() => navigate('/monitor'), 700);
-  };
+  const dteNumber = `DTE-01-${String(1452 + dtes.length).padStart(7, '0')}`;
 
-  const dteNumber = 'DTE-2026-000184';
+  const handleEmit = () => {
+    if (!canEmit) return;
+    setIsEmitting(true);
+
+    const newDTE: DTE = {
+      controlNumber: dteNumber,
+      uuid: Math.random().toString(36).slice(2, 10),
+      date: new Date().toISOString(),
+      customer: selectedCustomer,
+      type,
+      items: cart,
+      subtotal,
+      iva,
+      retention: retencion,
+      total,
+      // Si Hacienda no responde, el documento queda en cola local (contingencia)
+      // en lugar de transmitirse de inmediato.
+      status: isContingency ? 'PENDIENTE' : 'EMITIDO',
+      contingency: isContingency,
+    };
+
+    setTimeout(() => {
+      addDTE(newDTE);
+      navigate('/monitor');
+    }, 700);
+  };
 
   return (
     <div className="space-y-6">
@@ -61,13 +90,41 @@ export const NewEmissionView: React.FC = () => {
           </button>
           <button
             onClick={handleEmit}
-            className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-emerald-600/20 transition hover:bg-emerald-500"
+            disabled={!canEmit}
+            title={hasStockIssue ? 'Hay productos que superan el stock disponible' : undefined}
+            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white shadow-lg transition ${
+              !canEmit
+                ? 'cursor-not-allowed bg-slate-300 shadow-none'
+                : isContingency
+                ? 'bg-amber-600 shadow-amber-600/20 hover:bg-amber-500'
+                : 'bg-emerald-600 shadow-emerald-600/20 hover:bg-emerald-500'
+            }`}
           >
-            <Sparkles className="h-4 w-4" />
-            Firmar y emitir DTE
+            {isContingency ? <CloudCog className="h-4 w-4" /> : <Sparkles className="h-4 w-4" />}
+            {isEmitting ? 'Procesando...' : isContingency ? 'Guardar en contingencia' : 'Firmar y emitir DTE'}
           </button>
         </div>
       </div>
+
+      {isContingency && (
+        <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-800">
+          <CloudCog className="mt-0.5 h-5 w-5 flex-shrink-0" />
+          <p className="text-sm">
+            <strong>Modo de contingencia activo:</strong> no hay conexión con los servidores del Ministerio de
+            Hacienda. El documento se guardará localmente como <strong>PENDIENTE</strong> y se transmitirá
+            automáticamente cuando el Monitor DTE sincronice al reestablecerse la conexión.
+          </p>
+        </div>
+      )}
+
+      {hasStockIssue && (
+        <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-red-700">
+          <p className="text-sm">
+            <strong>Existencias insuficientes:</strong> uno o más productos superan el stock disponible en Kardex.
+            Ajusta las cantidades para poder emitir el documento.
+          </p>
+        </div>
+      )}
 
       <div className="grid gap-6 xl:grid-cols-[1.4fr_0.9fr]">
         <div className="space-y-6">
@@ -102,7 +159,7 @@ export const NewEmissionView: React.FC = () => {
                 <label className="mb-2 block text-sm font-medium text-slate-700">Tipo de documento</label>
                 <select
                   value={type}
-                  onChange={(event) => setType(event.target.value)}
+                  onChange={(event) => setType(event.target.value as 'FACTURA' | 'CREDITO_FISCAL')}
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-slate-800 outline-none transition focus:border-cyan-400"
                 >
                   <option value="CREDITO_FISCAL">Crédito fiscal</option>
@@ -201,8 +258,12 @@ export const NewEmissionView: React.FC = () => {
         <aside className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 text-slate-100 shadow-2xl shadow-slate-900/20">
           <div className="flex items-center justify-between bg-slate-900 px-5 py-4 text-xs uppercase tracking-[0.25em] text-slate-400">
             <span>Vista previa DTE</span>
-            <span className="rounded-full bg-emerald-500/15 px-2 py-1 text-[10px] font-semibold text-emerald-300">
-              válido
+            <span
+              className={`rounded-full px-2 py-1 text-[10px] font-semibold ${
+                isContingency ? 'bg-amber-500/15 text-amber-300' : 'bg-emerald-500/15 text-emerald-300'
+              }`}
+            >
+              {isContingency ? 'en cola local' : 'válido'}
             </span>
           </div>
 

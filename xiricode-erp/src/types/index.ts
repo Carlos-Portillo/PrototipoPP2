@@ -1,4 +1,4 @@
-export type Role = 'CAJERO' | 'SUPERVISOR' | 'GERENTE';
+export type Role = 'CAJERO' | 'SUPERVISOR' | 'GERENTE' | 'BODEGUERO' | 'GESTOR_COMPRAS';
 
 export interface User {
   id: string;
@@ -24,6 +24,9 @@ export interface Product {
   sku: string;
   price: number;
   stock: number;
+  minStock: number;
+  category: string;
+  warehouse: string;
 }
 
 export interface DTEItem extends Product {
@@ -43,6 +46,7 @@ export interface DTE {
   retention: number;
   total: number;
   status: 'EMITIDO' | 'PENDIENTE' | 'RECHAZADO';
+  contingency?: boolean;
 }
 
 export interface EventLog {

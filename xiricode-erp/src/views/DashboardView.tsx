@@ -1,7 +1,9 @@
 import React from 'react';
-import { mockDTEs } from '../data/mockData';
+import { useOperations } from '../context/OperationsContext';
 
 export const DashboardView: React.FC = () => {
+  const { dtes } = useOperations();
+  const recentDTEs = dtes.slice(0, 6);
   return (
     <div className="p-8 max-w-7xl mx-auto">
       <h2 className="text-2xl font-bold text-slate-800 mb-6">Dashboard de Control Fiscal y Operativo</h2>
@@ -52,7 +54,7 @@ export const DashboardView: React.FC = () => {
           <table className="w-full text-left text-sm text-slate-600">
             <thead><tr className="border-b uppercase text-xs text-slate-400"><th className="pb-2">ID</th><th className="pb-2">Cliente</th><th className="pb-2">Monto</th><th className="pb-2">Estado</th></tr></thead>
             <tbody>
-              {mockDTEs.map(dte => (
+              {recentDTEs.map(dte => (
                 <tr key={dte.controlNumber} className="border-b border-slate-50 last:border-0">
                   <td className="py-3 font-mono text-xs">{dte.controlNumber.slice(-8)}</td>
                   <td className="py-3 font-medium text-slate-800">{dte.customer.name}</td>

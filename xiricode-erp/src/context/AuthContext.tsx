@@ -17,10 +17,18 @@ export const AuthProvider: React.FC<{children: React.ReactNode}> = ({ children }
     if (saved) setUser(JSON.parse(saved));
   }, []);
 
+  const roleNames: Record<Role, string> = {
+    CAJERO: 'Agente de Ventas',
+    SUPERVISOR: 'Admin TI',
+    GERENTE: 'Gerencia Operativa',
+    BODEGUERO: 'Encargado de Bodega',
+    GESTOR_COMPRAS: 'Gestor de Compras',
+  };
+
   const login = (role: Role) => {
     const mockUser: User = {
       id: Math.random().toString(36).substr(2, 9),
-      name: role === 'CAJERO' ? 'Agente de Ventas' : role === 'SUPERVISOR' ? 'Admin TI' : 'Gerencia Operativa',
+      name: roleNames[role],
       email: `${role.toLowerCase()}@xiricode.com`,
       role,
       token: `jwt_mock_${role}_${Date.now()}`

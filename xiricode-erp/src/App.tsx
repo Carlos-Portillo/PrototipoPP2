@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { OperationsProvider } from './context/OperationsContext';
 import { Sidebar } from './components/layout/Sidebar';
 import { Header } from './components/layout/Header';
 import { LoginView } from './views/LoginView';
@@ -9,6 +10,7 @@ import { NewEmissionView } from './views/NewEmissionView';
 import { TaxpayersView } from './views/TaxpayersView';
 import { DTEMonitorView } from './views/DTEMonitorView';
 import { EventLogView } from './views/EventLogView';
+import { InventoryView } from './views/InventoryView';
 
 const getRoleRedirect = (role?: string) => {
   switch (role) {
@@ -16,6 +18,9 @@ const getRoleRedirect = (role?: string) => {
       return '/dashboard';
     case 'SUPERVISOR':
       return '/monitor';
+    case 'BODEGUERO':
+    case 'GESTOR_COMPRAS':
+      return '/inventory';
     case 'CAJERO':
     default:
       return '/emission';
@@ -51,6 +56,7 @@ const AppRoutes = () => {
       <Route path="/taxpayers" element={<PrivateRoute roles={['CAJERO']}><TaxpayersView /></PrivateRoute>} />
       <Route path="/monitor" element={<PrivateRoute roles={['SUPERVISOR']}><DTEMonitorView /></PrivateRoute>} />
       <Route path="/logs" element={<PrivateRoute roles={['SUPERVISOR']}><EventLogView /></PrivateRoute>} />
+      <Route path="/inventory" element={<PrivateRoute roles={['BODEGUERO', 'GESTOR_COMPRAS']}><InventoryView /></PrivateRoute>} />
       <Route path="*" element={<Navigate to={user ? getRoleRedirect(user.role) : '/login'} replace />} />
     </Routes>
   );
@@ -59,9 +65,11 @@ const AppRoutes = () => {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <OperationsProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </OperationsProvider>
     </AuthProvider>
   );
 }

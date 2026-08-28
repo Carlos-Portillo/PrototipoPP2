@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Activity, FileText, LayoutDashboard, LogOut, ShieldCheck, Users } from 'lucide-react';
+import { Activity, FileText, LayoutDashboard, LogOut, PackageSearch, ShieldCheck, Users } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 export const Sidebar: React.FC = () => {
@@ -13,6 +13,12 @@ export const Sidebar: React.FC = () => {
       items: [
         { path: '/emission', icon: FileText, label: 'Nueva emisión', roles: ['CAJERO'] },
         { path: '/taxpayers', icon: Users, label: 'Contribuyentes', roles: ['CAJERO'] },
+      ],
+    },
+    {
+      title: 'Inventario',
+      items: [
+        { path: '/inventory', icon: PackageSearch, label: 'Kardex', roles: ['BODEGUERO', 'GESTOR_COMPRAS'] },
       ],
     },
     {
